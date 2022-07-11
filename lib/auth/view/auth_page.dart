@@ -10,17 +10,20 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  late TextEditingController _controller;
+  late TextEditingController _controllerEmail;
+  late TextEditingController _controllerPassword;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    _controllerEmail = TextEditingController();
+    _controllerPassword = TextEditingController();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
     super.dispose();
   }
 
@@ -31,16 +34,23 @@ class _AuthPageState extends State<AuthPage> {
       body: Container(
           padding: const EdgeInsets.all(10),
           child: Column(
-            children: [Input(), TextInformation()],
+            children: [
+              Input(
+                  emailController: _controllerEmail,
+                  passwordController: _controllerPassword),
+              TextInformation()
+            ],
           )),
     ));
   }
 }
 
 class Input extends StatelessWidget {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  @override
+  const Input(
+      {required this.emailController, required this.passwordController});
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
   Widget build(BuildContext context) {
     return Column(children: [
       BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
@@ -76,9 +86,12 @@ class Input extends StatelessWidget {
       ),
       BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
         return TextButton(
-            onPressed: () => context.read<AuthBloc>().add(AuthLogin(
-                auth: Auth(
-                    id: state.props!.id, password: state.props!.password))),
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthLogin(
+                  auth: Auth(
+                      id: emailController.text,
+                      password: passwordController.text)));
+            },
             child: Container(
               padding: EdgeInsets.all(10),
               child: const Text('Login'),
